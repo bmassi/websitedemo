@@ -84,11 +84,14 @@
             height: 100%;
         }
         @media only screen and (max-width: 768px) {
-    body {
-        background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F2108551.jpg&f=1&nofb=1&ipt=f6b0d41bb9bc249f1d3c64dcbbdab7bebf1e1d0cb50c63a99ff3f65511d78c5c&ipo=images') no-repeat center center/cover;
-    }
-}
-
+            body {
+                background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F2108551.jpg&f=1&nofb=1&ipt=f6b0d41bb9bc249f1d3c64dcbbdab7bebf1e1d0cb50c63a99ff3f65511d78c5c&ipo=images') no-repeat center center/cover;
+            }
+            canvas {
+                width: 80%; /* Make canvas responsive */
+                height: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -117,13 +120,27 @@
         // Canvas Matrix Rain Effect
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 300;
-        canvas.height = 150;
+        
+        // Adjust canvas size based on window size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth < 768 ? window.innerWidth * 0.8 : 300; // 80% width on mobile
+            canvas.height = window.innerWidth < 768 ? 100 : 150; // 100px height on mobile
+            initMatrixRain(); // Re-initialize matrix rain
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // Initial resize
 
-        const fontSize = 14;
+        const fontSize = 12; // Reduced font size for mobile
         const columns = canvas.width / fontSize;
         const drops = Array.from({ length: columns }, () => 1);
         const letters = 'アニメーションスタイル';
+
+        function initMatrixRain() {
+            drops.length = 0; // Reset drops on resize
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1; // Reinitialize drops
+            }
+        }
 
         function matrixRain() {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
