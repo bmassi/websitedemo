@@ -85,7 +85,7 @@
         }
         @media only screen and (max-width: 768px) {
             body {
-                background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F2108551.jpg&f=1&nofb=1&ipt=f6b0d41bb9bc249f1d3c64dcbbdab7bebf1e1d0cb50c63a99ff3f65511d78c5c&ipo=images') no-repeat center center/cover;
+                background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpaperaccess.com%2Ffull%2F2108551.jpg&f=1&nofb=1&ipt=f6b0d41bb9bc249f1d3c64dcbbdab7bebf1e1d0cb50c63a99ff3f65511d78c5&ipo=images') no-repeat center center/cover;
             }
             canvas {
                 width: 80%; /* Make canvas responsive */
@@ -121,6 +121,8 @@
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         
+        let rainInterval; // Variable to hold the interval
+
         // Adjust canvas size based on window size
         function resizeCanvas() {
             canvas.width = window.innerWidth < 768 ? window.innerWidth * 0.8 : 300; // 80% width on mobile
@@ -158,10 +160,18 @@
                 drops[i]++;
             }
         }
-        setInterval(matrixRain, 50);
+
+        function startMatrixRain() {
+            rainInterval = setInterval(matrixRain, 50); // Start the matrix rain effect
+        }
+
+        function stopMatrixRain() {
+            clearInterval(rainInterval); // Stop the matrix rain effect
+        }
 
         // Close Modal Button
         document.getElementById('close-modal').onclick = () => {
+            stopMatrixRain(); // Stop matrix rain when modal is closed
             document.getElementById('modal').style.display = 'none';
         };
 
@@ -221,6 +231,7 @@
 
         // Show Modal
         function showModal() {
+            startMatrixRain(); // Start matrix rain when showing modal
             document.getElementById('modal').style.display = 'flex';
         }
 
