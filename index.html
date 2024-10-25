@@ -203,7 +203,7 @@
         // Single Pull Button Event
         document.getElementById('single-roll').addEventListener('click', () => {
             if (currency < 10) {
-                showModal();
+                showModal(); // Show modal if currency is less than 10
                 return;
             }
             currency -= 10;
@@ -216,7 +216,7 @@
         // Multi Pull Button Event
         document.getElementById('multi-roll').addEventListener('click', () => {
             if (currency < 100) {
-                showModal();
+                showModal(); // Show modal if currency is less than 100
                 return;
             }
             currency -= 100;
@@ -231,7 +231,7 @@
 
         // Show Modal
         function showModal() {
-            startMatrixRain(); // Start matrix rain when showing modal
+            startMatrixRain(); // Start matrix rain only when showing modal
             document.getElementById('modal').style.display = 'flex';
         }
 
