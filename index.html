@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gacha Game</title>
+    <style>
+        /* Reset and general styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; }
+
+        /* Container and content styling */
+        .container { padding: 20px; }
+        h1 { font-size: 2rem; margin-bottom: 10px; }
+        #currency, #result { margin-top: 15px; font-size: 1.25rem; }
+        button { padding: 10px 20px; font-size: 1rem; margin: 10px; cursor: pointer; }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            position: relative;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Canvas styles */
+        canvas { display: block; margin: 0 auto; background: #000; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Custom Gacha Game</h1>
+        <div id="currency">Currency: 100</div>
+        <div id="result"></div>
+        <button id="single-roll">Roll 1 Gacha</button>
+        <button id="multi-roll">Roll 10 Gacha</button>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span id="close-modal" class="close-button">&times;</span>
+                <canvas></canvas> <!-- Canvas for the animation -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize canvas and context
+        var canvas = document.querySelector('canvas'),
+            ctx = canvas.getContext('2d');
+
+        // Set canvas dimensions
+        canvas.width = window.innerWidth * 0.8; // 80% of window width
+        canvas.height = 150; // Fixed height for animation area
+
+        // Word array
+        var words = ['Hello', 'World', 'Gacha', 'Game', 'Pull', 'Lucky', 'Draw', 'Win', 'Epic', 'Legendary'];
+        var fontSize = 20;
+        var columns = Math.floor(canvas.width / fontSize);
+
+        // Initialize drops for animation
+        var drops = [];
+        for (var i = 0; i < columns; i++) drops[i] = 1;
+
+        // Draw function
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < drops.length; i++) {
+                var text = words[Math.floor(Math.random() * words.length)];
+                ctx.fillStyle = '#0f0';
+                ctx.font = `${fontSize}px Arial`;
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                drops[i]++;
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) drops[i] = 0;
+            }
+        }
+
+        // Loop the animation
+        let animationInterval;
+        function startAnimation() { animationInterval = setInterval(draw, 33); }
+        function stopAnimation() { clearInterval(animationInterval); }
+
+        // Gacha items setup
+        const gachaItems = [
+            { name: "Common Sword", rarity: "common", probability: 50 },
+            { name: "Rare Shield", rarity: "rare", probability: 30 },
+            { name: "Epic Armor", rarity: "epic", probability: 15 },
+            { name: "Legendary Staff", rarity: "legendary", probability: 4 },
+            { name: "Mythical Phoenix", rarity: "mythical", probability: 1 }
+        ];
+
+        let inventory = [];
+        let playerCurrency = 100;
+        const resultElement = document.getElementById("result");
+
+        // Roll Gacha function
+        function rollGacha() {
+            resultElement.innerHTML = '';
+            const random = Math.random() * 100;
+            let cumulative = 0;
+
+            for (const item of gachaItems) {
+                cumulative += item.probability;
+                if (random < cumulative) {
+                    resultElement.textContent = `You got: ${item.name} (${item.rarity})!`;
+                    inventory.push(item);
+                    playSound(item.rarity);
+                    break;
+                }
+            }
+        }
+
+        // Play sound based on rarity
+        function playSound(rarity) {
+            const sound = new Audio(rarity === 'legendary' || rarity === 'mythical' ? 'rare-pull.mp3' : 'common-pull.mp3');
+            sound.play();
+        }
+
+        // Roll multiple Gachas
+        function rollGachaMultiple(times) {
+            if (playerCurrency >= times * 10) {
+                playerCurrency -= times * 10;
+                document.getElementById("currency").textContent = `Currency: ${playerCurrency}`;
+                for (let i = 0; i < times; i++) rollGacha();
+            } else {
+                showNoCurrencyAnimation();
+            }
+        }
+
+        // Show no currency animation
+        function showNoCurrencyAnimation() {
+            const modal = document.getElementById("modal");
+            modal.style.display = "flex";
+            startAnimation();
+        }
+
+        // Close modal event
+        document.getElementById("close-modal").addEventListener("click", function() {
+            document.getElementById("modal").style.display = "none";
+            stopAnimation();
+        });
+
+        // Event listeners for buttons
+        document.getElementById("single-roll").addEventListener("click", function() {
+            if (playerCurrency >= 10) {
+                playerCurrency -= 10;
+                document.getElementById("currency").textContent = `Currency: ${playerCurrency}`;
+                rollGacha();
+            } else {
+                showNoCurrencyAnimation();
+            }
+        });
+
+        document.getElementById("multi-roll").addEventListener("click", function() {
+            rollGachaMultiple(10);
+        });
+    </script>
+</body>
+</html>
