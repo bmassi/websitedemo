@@ -157,6 +157,16 @@
             resultDiv.textContent = `You pulled: ${result}`;
         }
 
+        // Update Collection
+        function updateCollection(pulls) {
+            const inventoryList = document.getElementById('inventory-list');
+            pulls.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                inventoryList.appendChild(listItem);
+            });
+        }
+
         // Single Pull Button Event
         document.getElementById('single-roll').addEventListener('click', () => {
             if (currency < 10) {
@@ -167,6 +177,7 @@
             updateCurrencyDisplay();
             const result = items[Math.floor(Math.random() * items.length)];
             showResult(result);
+            updateCollection([result]); // Add result to collection
         });
 
         // Multi Pull Button Event
@@ -182,12 +193,16 @@
                 results.push(items[Math.floor(Math.random() * items.length)]);
             }
             showResult(`You pulled: ${results.join(', ')}`);
+            updateCollection(results); // Add results to collection
         });
 
         // Show Modal
         function showModal() {
             document.getElementById('modal').style.display = 'flex';
         }
+
+        // Hide the modal on load
+        document.getElementById('modal').style.display = 'none';
     </script>
 </body>
 </html>
