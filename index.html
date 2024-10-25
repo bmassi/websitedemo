@@ -119,6 +119,8 @@
 
         let rainInterval; // Variable to hold the interval
         let drops = []; // Declare drops here
+        const fontSize = 12; // Reduced font size for mobile
+        const letters = 'アニメーションスタイル';
 
         // Adjust canvas size based on window size
         function resizeCanvas() {
@@ -128,9 +130,6 @@
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas(); // Initial resize
-
-        const fontSize = 12; // Reduced font size for mobile
-        const letters = 'アニメーションスタイル';
 
         function initMatrixRain() {
             drops.length = 0; // Reset drops on resize
