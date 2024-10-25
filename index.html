@@ -5,98 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anime-Style Gacha Game</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: Arial, sans-serif;
-    background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapers.com%2Fimages%2Fhd%2Fuwu-sbfp3wnmrsoez0fb.jpg&f=1&nofb=1&ipt=50312a10b9a7bb1ed26dad7e5b536440cd3f9054feb3a12ecacbb0877f17f48b&ipo=images') no-repeat center center/cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    color: black;
-}
-.container {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-    color: black;
-}
-h1 {
-    font-family: 'Comic Sans MS', cursive;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: black;
-}
-#currency, #result, #inventory h2, #inventory-list {
-    color: black;
-}
-
+        /* Main Styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwallpapers.com%2Fimages%2Fhd%2Fuwu-sbfp3wnmrsoez0fb.jpg&f=1&nofb=1') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: black;
+        }
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            color: black;
+        }
+        h1 {
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: black;
+        }
+        #currency, #result, #inventory h2, #inventory-list {
+            color: black;
+        }
         button {
             padding: 10px 20px;
             font-size: 16px;
             margin-top: 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #ff80ab;
-            color: white;
         }
-        #result, #currency {
-            margin: 20px 0;
-            font-size: 1.2rem;
-        }
-        #inventory {
-            margin-top: 20px;
-        }
-        #inventory-list {
-            list-style: none;
-            padding: 0;
-            color: black;
-        }
-        #modal {
+
+        /* Modal Styles */
+        .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
             justify-content: center;
+            align-items: center;
         }
         .modal-content {
-            position: relative;
-            width: 80%;
-            max-width: 500px;
-            background: rgba(0, 0, 0, 0.85);
-            padding: 20px;
-            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
             color: #0f0;
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
             text-align: center;
+            position: relative;
         }
         .close-button {
             position: absolute;
             top: 10px;
             right: 15px;
-            color: #ff4081;
             font-size: 24px;
             cursor: pointer;
+            color: #0f0;
         }
+
+        /* Canvas for Matrix Rain */
         canvas {
+            position: relative;
             display: block;
+            margin: 20px auto;
+        }
+        .canvas-container {
             width: 100%;
-            height: 200px;
+            height: 100%;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Anime Gacha Game</h1>
+        <h1>Anime-Style Gacha Game</h1>
         <div id="currency">Currency: 100</div>
-        <div id="result"></div>
+        <div id="result">Your Pull Result Will Appear Here</div>
         <button id="single-roll">Roll 1 Gacha</button>
         <button id="multi-roll">Roll 10 Gacha</button>
         <div id="inventory">
@@ -105,78 +99,67 @@ h1 {
         </div>
     </div>
 
-    <!-- Modal for No Currency Rain Animation -->
-    <div id="modal">
+    <!-- Modal with Matrix Rain -->
+    <div id="modal" class="modal">
         <div class="modal-content">
             <span id="close-modal" class="close-button">&times;</span>
-            <p>No more pulls available!</p>
-            <canvas id="rain-canvas"></canvas>
+            <p>Not enough currency for a pull!</p>
+            <canvas id="matrix-canvas"></canvas>
         </div>
     </div>
 
     <script>
-        const gachaItems = [
-            { name: "Common Sword", rarity: "common", probability: 50 },
-            { name: "Rare Shield", rarity: "rare", probability: 30 },
-            { name: "Epic Armor", rarity: "epic", probability: 15 },
-            { name: "Legendary Staff", rarity: "legendary", probability: 4 },
-            { name: "Mythical Phoenix", rarity: "mythical", probability: 1 }
-        ];
-        let playerCurrency = 100;
+        // Canvas Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400;
+        canvas.height = 200;
 
-        // Gacha roll functions
-        function rollGacha(times) {
-            if (playerCurrency >= times * 10) {
-                playerCurrency -= times * 10;
-                document.getElementById("currency").textContent = `Currency: ${playerCurrency}`;
-                document.getElementById("result").textContent = `You rolled ${times} times!`;
-            } else {
-                showModal();
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array.from({ length: columns }, () => 1);
+        const letters = 'アニメーションスタイル';
+
+        function matrixRain() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
             }
         }
+        setInterval(matrixRain, 50);
 
-        // Event listeners for single and multi-roll buttons
-        document.getElementById("single-roll").addEventListener("click", () => rollGacha(1));
-        document.getElementById("multi-roll").addEventListener("click", () => rollGacha(10));
+        // Close Modal Button
+        document.getElementById('close-modal').onclick = () => {
+            document.getElementById('modal').style.display = 'none';
+        };
 
-        // Show modal when out of currency
-        function showModal() {
-            document.getElementById("modal").style.display = "flex";
-            startRainAnimation();
-        }
+        // Sample Gacha Items and Result
+        const items = ['Common Sword', 'Rare Shield', 'Epic Armor', 'Legendary Staff', 'Mythical Phoenix'];
+        let currency = 100;
 
-        // Close modal functionality
-        document.getElementById("close-modal").addEventListener("click", () => {
-            document.getElementById("modal").style.display = "none";
+        document.getElementById('single-roll').addEventListener('click', () => {
+            if (currency < 10) {
+                showModal();
+                return;
+            }
+            currency -= 10;
+            document.getElementById('currency').textContent = `Currency: ${currency}`;
+            const result = items[Math.floor(Math.random() * items.length)];
+            document.getElementById('result').textContent = `You pulled: ${result}`;
         });
 
-        // Rain animation
-        function startRainAnimation() {
-            const canvas = document.getElementById('rain-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-
-            const words = ["Luck", "Try", "Next Time", "Chance", "Hope"];
-            const fontSize = 14;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                ctx.fillStyle = '#0f0';
-                ctx.font = `${fontSize}px Arial`;
-
-                drops.forEach((y, x) => {
-                    const text = words[Math.floor(Math.random() * words.length)];
-                    ctx.fillText(text, x * fontSize, y * fontSize);
-
-                    drops[x] = y * fontSize > canvas.height && Math.random() > 0.95 ? 0 : y + 1;
-                });
-            }
-            setInterval(draw, 33);
+        function showModal() {
+            document.getElementById('modal').style.display = 'flex';
         }
     </script>
 </body>
