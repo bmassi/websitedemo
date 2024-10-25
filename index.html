@@ -76,7 +76,6 @@
 
         /* Canvas for Matrix Rain */
         canvas {
-            position: relative;
             display: block;
             margin: 20px auto;
         }
@@ -112,8 +111,8 @@
         // Canvas Matrix Rain Effect
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = 400;
-        canvas.height = 200;
+        canvas.width = 300;
+        canvas.height = 150;
 
         const fontSize = 14;
         const columns = canvas.width / fontSize;
@@ -147,17 +146,45 @@
         const items = ['Common Sword', 'Rare Shield', 'Epic Armor', 'Legendary Staff', 'Mythical Phoenix'];
         let currency = 100;
 
+        // Update Currency Display
+        function updateCurrencyDisplay() {
+            document.getElementById('currency').textContent = `Currency: ${currency}`;
+        }
+
+        // Pull Result Display
+        function showResult(result) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = `You pulled: ${result}`;
+        }
+
+        // Single Pull Button Event
         document.getElementById('single-roll').addEventListener('click', () => {
             if (currency < 10) {
                 showModal();
                 return;
             }
             currency -= 10;
-            document.getElementById('currency').textContent = `Currency: ${currency}`;
+            updateCurrencyDisplay();
             const result = items[Math.floor(Math.random() * items.length)];
-            document.getElementById('result').textContent = `You pulled: ${result}`;
+            showResult(result);
         });
 
+        // Multi Pull Button Event
+        document.getElementById('multi-roll').addEventListener('click', () => {
+            if (currency < 100) {
+                showModal();
+                return;
+            }
+            currency -= 100;
+            updateCurrencyDisplay();
+            let results = [];
+            for (let i = 0; i < 10; i++) {
+                results.push(items[Math.floor(Math.random() * items.length)]);
+            }
+            showResult(`You pulled: ${results.join(', ')}`);
+        });
+
+        // Show Modal
         function showModal() {
             document.getElementById('modal').style.display = 'flex';
         }
