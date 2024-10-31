@@ -171,8 +171,44 @@
         };
 
         // Sample Gacha Items and Result
-        const items = ['Common Sword', 'Rare Shield', 'Epic Armor', 'Legendary Staff', 'Mythical Phoenix'];
-        let currency = 100;
+        const items = [
+    { name: 'Common Sword', rarity: 'Common' },
+    { name: 'Common Shield', rarity: 'Common' },
+    { name: 'Common Potion', rarity: 'Common' },
+    { name: 'Common Bow', rarity: 'Common' },
+    { name: 'Common Staff', rarity: 'Common' },
+    { name: 'Rare Shield', rarity: 'Rare' },
+    { name: 'Rare Helmet', rarity: 'Rare' },
+    { name: 'Rare Armor', rarity: 'Rare' },
+    { name: 'Rare Ring', rarity: 'Rare' },
+    { name: 'Rare Amulet', rarity: 'Rare' },
+    { name: 'Epic Armor', rarity: 'Epic' },
+    { name: 'Epic Sword', rarity: 'Epic' },
+    { name: 'Epic Bow', rarity: 'Epic' },
+    { name: 'Epic Wand', rarity: 'Epic' },
+    { name: 'Epic Cloak', rarity: 'Epic' },
+    { name: 'Legendary Staff', rarity: 'Legendary' },
+    { name: 'Legendary Shield', rarity: 'Legendary' },
+    { name: 'Legendary Sword', rarity: 'Legendary' },
+    { name: 'Legendary Amulet', rarity: 'Legendary' },
+    { name: 'Legendary Boots', rarity: 'Legendary' },
+    { name: 'Mythical Phoenix', rarity: 'Mythical' },
+    { name: 'Mythical Dragon', rarity: 'Mythical' },
+    { name: 'Mythical Unicorn', rarity: 'Mythical' },
+    { name: 'Mythical Crystal', rarity: 'Mythical' },
+    { name: 'Mythical Grimoire', rarity: 'Mythical' },
+    { name: 'Mythical Staff of Power', rarity: 'Mythical' },
+    { name: 'Mythical Cloak of Shadows', rarity: 'Mythical' },
+    { name: 'Mythical Blade of Destiny', rarity: 'Mythical' },
+    { name: 'Epic Crossbow', rarity: 'Epic' },
+    { name: 'Epic Shield of Valor', rarity: 'Epic' },
+    { name: 'Rare Boots', rarity: 'Rare' },
+    { name: 'Rare Staff', rarity: 'Rare' },
+    { name: 'Common Helmet', rarity: 'Common' },
+    { name: 'Common Gloves', rarity: 'Common' },
+    { name: 'Common Pendant', rarity: 'Common' },
+];
+        let currency = 500;
 
         // Update Currency Display
         function updateCurrencyDisplay() {
@@ -180,10 +216,10 @@
         }
 
         // Pull Result Display
-        function showResult(result) {
-            const resultDiv = document.getElementById('result');
-            resultDiv.textContent = `You pulled: ${result}`;
-        }
+function showResult(result) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.textContent = `You pulled: ${result.name} (Rarity: ${result.rarity})`;
+}
 
         // Update Collection
         function updateCollection(pulls) {
@@ -196,34 +232,55 @@
         }
 
         // Single Pull Button Event
-        document.getElementById('single-roll').addEventListener('click', () => {
-            if (currency < 10) {
-                showModal(); // Show modal if currency is less than 10
-                return;
-            }
-            currency -= 10;
-            updateCurrencyDisplay();
-            const result = items[Math.floor(Math.random() * items.length)];
-            showResult(result);
-            updateCollection([result]); // Add result to collection
-        });
+document.getElementById('single-roll').addEventListener('click', () => {
+    if (currency < 10) {
+        showModal(); // Show modal if currency is less than 10
+        return;
+    }
+    currency -= 10;
+    updateCurrencyDisplay();
+    const result = getRandomItem();
+    showResult(result);
+    updateCollection([result.name]); // Add result to collection
+});
 
         // Multi Pull Button Event
-        document.getElementById('multi-roll').addEventListener('click', () => {
-            if (currency < 100) {
-                showModal(); // Show modal if currency is less than 100
-                return;
-            }
-            currency -= 100;
-            updateCurrencyDisplay();
-            let results = [];
-            for (let i = 0; i < 10; i++) {
-                results.push(items[Math.floor(Math.random() * items.length)]);
-            }
-            showResult(`You pulled: ${results.join(', ')}`);
-            updateCollection(results); // Add results to collection
-        });
+document.getElementById('multi-roll').addEventListener('click', () => {
+    if (currency < 100) {
+        showModal(); // Show modal if currency is less than 100
+        return;
+    }
+    currency -= 100;
+    updateCurrencyDisplay();
+    let results = [];
+    for (let i = 0; i < 10; i++) {
+        results.push(getRandomItem());
+    }
+    showResult(`You pulled: ${results.map(item => `${item.name} (Rarity: ${item.rarity})`).join(', ')}`);
+    updateCollection(results.map(item => item.name)); // Add results to collection
+});
+function getRandomItem() {
+    const rarityChances = {
+        'Common': 50, // 50% chance
+        'Rare': 30,   // 30% chance
+        'Epic': 15,   // 15% chance
+        'Legendary': 4,// 4% chance
+        'Mythical': 1  // 1% chance
+    };
 
+    const totalChances = Object.values(rarityChances).reduce((a, b) => a + b, 0);
+    const randomNum = Math.floor(Math.random() * totalChances);
+    let cumulativeChance = 0;
+
+    for (const [rarity, chance] of Object.entries(rarityChances)) {
+        cumulativeChance += chance;
+        if (randomNum < cumulativeChance) {
+            // Filter items by the selected rarity and return one randomly
+            const rareItems = items.filter(item => item.rarity === rarity);
+            return rareItems[Math.floor(Math.random() * rareItems.length)];
+        }
+    }
+}
         // Show Modal
         function showModal() {
             startMatrixRain(); // Start matrix rain only when showing modal
