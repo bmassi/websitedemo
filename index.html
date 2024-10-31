@@ -171,82 +171,67 @@
         };
 
         // Sample Gacha Items and Result
-        const items = [
-            { name: 'Common Sword', rarity: 'Common' },
-            { name: 'Common Shield', rarity: 'Common' },
-            { name: 'Common Potion', rarity: 'Common' },
-            { name: 'Common Bow', rarity: 'Common' },
-            { name: 'Common Staff', rarity: 'Common' },
-            { name: 'Rare Shield', rarity: 'Rare' },
-            { name: 'Rare Helmet', rarity: 'Rare' },
-            { name: 'Rare Armor', rarity: 'Rare' },
-            { name: 'Rare Ring', rarity: 'Rare' },
-            { name: 'Rare Amulet', rarity: 'Rare' },
-            { name: 'Epic Armor', rarity: 'Epic' },
-            { name: 'Epic Sword', rarity: 'Epic' },
-            { name: 'Epic Bow', rarity: 'Epic' },
-            { name: 'Epic Wand', rarity: 'Epic' },
-            { name: 'Epic Cloak', rarity: 'Epic' },
-            { name: 'Legendary Staff', rarity: 'Legendary' },
-            { name: 'Legendary Shield', rarity: 'Legendary' },
-            { name: 'Legendary Sword', rarity: 'Legendary' },
-            { name: 'Legendary Amulet', rarity: 'Legendary' },
-            { name: 'Legendary Boots', rarity: 'Legendary' },
-            { name: 'Mythical Phoenix', rarity: 'Mythical' },
-            { name: 'Mythical Dragon', rarity: 'Mythical' },
-            { name: 'Mythical Unicorn', rarity: 'Mythical' },
-            { name: 'Mythical Crystal', rarity: 'Mythical' },
-            { name: 'Mythical Grimoire', rarity: 'Mythical' },
-            { name: 'Mythical Staff of Legends', rarity: 'Mythical' }
-        ];
-        let currency = 100; // Initial currency
-        const maxInventorySize = 20; // Max number of items in inventory
+        const items = ['Common Sword', 'Rare Shield', 'Epic Armor', 'Legendary Staff', 'Mythical Phoenix'];
+        let currency = 100;
 
-        // Function to handle gacha pulls
-        function handleGachaPull(isMultiPull) {
-            const pullCount = isMultiPull ? 10 : 1;
-            if (currency < pullCount) {
-                document.getElementById('modal').style.display = 'flex';
-                startMatrixRain();
-                return; // Exit if not enough currency
-            }
-            currency -= pullCount; // Deduct currency
-            document.getElementById('currency').innerText = `Currency: ${currency}`;
-            const results = [];
-            for (let i = 0; i < pullCount; i++) {
-                const randomItem = items[Math.floor(Math.random() * items.length)];
-                results.push(randomItem);
-                updateCollection(randomItem);
-            }
-            displayResults(results);
+        // Update Currency Display
+        function updateCurrencyDisplay() {
+            document.getElementById('currency').textContent = `Currency: ${currency}`;
         }
 
-        // Function to update the inventory collection
-        function updateCollection(item) {
-            const inventoryList = document.getElementById('inventory-list');
-            if ([...inventoryList.children].some(li => li.innerText === item.name)) {
-                // Item already in inventory
-                alert('You already have this item!');
-            } else {
-                if (inventoryList.children.length >= maxInventorySize) {
-                    alert('Inventory is full!'); // Check if inventory is full
-                } else {
-                    const listItem = document.createElement('li');
-                    listItem.innerText = `${item.name} (Rarity: ${item.rarity})`;
-                    inventoryList.appendChild(listItem);
-                }
-            }
-        }
-
-        // Function to display pull results
-        function displayResults(results) {
+        // Pull Result Display
+        function showResult(result) {
             const resultDiv = document.getElementById('result');
-            resultDiv.innerText = results.map(item => `${item.name} (Rarity: ${item.rarity})`).join(', ');
+            resultDiv.textContent = `You pulled: ${result}`;
         }
 
-        // Event Listeners
-        document.getElementById('single-roll').onclick = () => handleGachaPull(false);
-        document.getElementById('multi-roll').onclick = () => handleGachaPull(true);
+        // Update Collection
+        function updateCollection(pulls) {
+            const inventoryList = document.getElementById('inventory-list');
+            pulls.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                inventoryList.appendChild(listItem);
+            });
+        }
+
+        // Single Pull Button Event
+        document.getElementById('single-roll').addEventListener('click', () => {
+            if (currency < 10) {
+                showModal(); // Show modal if currency is less than 10
+                return;
+            }
+            currency -= 10;
+            updateCurrencyDisplay();
+            const result = items[Math.floor(Math.random() * items.length)];
+            showResult(result);
+            updateCollection([result]); // Add result to collection
+        });
+
+        // Multi Pull Button Event
+        document.getElementById('multi-roll').addEventListener('click', () => {
+            if (currency < 100) {
+                showModal(); // Show modal if currency is less than 100
+                return;
+            }
+            currency -= 100;
+            updateCurrencyDisplay();
+            let results = [];
+            for (let i = 0; i < 10; i++) {
+                results.push(items[Math.floor(Math.random() * items.length)]);
+            }
+            showResult(`You pulled: ${results.join(', ')}`);
+            updateCollection(results); // Add results to collection
+        });
+
+        // Show Modal
+        function showModal() {
+            startMatrixRain(); // Start matrix rain only when showing modal
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // Hide the modal on load
+        document.getElementById('modal').style.display = 'none';
     </script>
 </body>
 </html>
